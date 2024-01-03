@@ -37,6 +37,7 @@ use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\WithValidationResult;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Events\BeforeSheet;
 use Maatwebsite\Excel\Exceptions\ConcernConflictException;
@@ -681,17 +682,17 @@ class Sheet
         unset($this->worksheet);
     }
 
-    /**
-     * @return array
-     */
-    protected function validated(WithValidation $import, int $startRow, $rows): array
+    protected function validated(WithValidation $import, int $startRow, $rows): array|Collection
     {
         $toValidate = (new Collection($rows))->mapWithKeys(function ($row, $index) use ($startRow) {
             return [($startRow + $index) => $row];
         });
 
         try {
-            return app(RowValidator::class)->validate($toValidate->toArray(), $import);
+            $result = app(RowValidator::class)->validate($toValidate->toArray(), $import);
+            if($import instanceof WithValidationResult){
+                return $result;
+            }
         } catch (RowSkippedException $e) {
             foreach ($e->skippedRows() as $row) {
                 unset($rows[$row - $startRow]);
