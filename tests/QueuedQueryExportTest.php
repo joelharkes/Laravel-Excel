@@ -18,9 +18,8 @@ class QueuedQueryExportTest extends TestCase
         parent::setUp();
 
         $this->loadLaravelMigrations(['--database' => 'testing']);
-        $this->withFactories(__DIR__ . '/Data/Stubs/Database/Factories');
 
-        factory(User::class)->times(100)->create([]);
+        User::factory()->times(100)->create([]);
     }
 
     /**
