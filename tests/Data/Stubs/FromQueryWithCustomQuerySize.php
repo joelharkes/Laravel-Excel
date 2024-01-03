@@ -2,10 +2,8 @@
 
 namespace Maatwebsite\Excel\Tests\Data\Stubs;
 
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -17,18 +15,13 @@ class FromQueryWithCustomQuerySize implements FromQuery, WithCustomQuerySize, Wi
 {
     use Exportable;
 
-    /**
-     * @return Builder|EloquentBuilder|Relation
-     */
-    public function query()
+    public function query(): Builder
     {
-        $query = Group::with('users')
+        return Group::with('users')
             ->join('group_user', 'groups.id', '=', 'group_user.group_id')
             ->select('groups.*', DB::raw('count(group_user.user_id) as number_of_users'))
             ->groupBy('groups.id')
             ->orderBy('number_of_users');
-
-        return $query;
     }
 
     /**

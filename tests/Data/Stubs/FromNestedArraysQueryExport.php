@@ -2,9 +2,7 @@
 
 namespace Maatwebsite\Excel\Tests\Data\Stubs;
 
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Contracts\Database\Query\Builder;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -14,14 +12,9 @@ class FromNestedArraysQueryExport implements FromQuery, WithMapping
 {
     use Exportable;
 
-    /**
-     * @return Builder|EloquentBuilder|Relation
-     */
-    public function query()
+    public function query(): Builder
     {
-        $query = Group::with('users');
-
-        return $query;
+        return Group::with('users');
     }
 
     /**
