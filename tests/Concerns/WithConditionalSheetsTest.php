@@ -11,16 +11,6 @@ use Maatwebsite\Excel\Tests\TestCase;
 class WithConditionalSheetsTest extends TestCase
 {
     /**
-     * Setup the test environment.
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->withFactories(__DIR__ . '/../Data/Stubs/Database/Factories');
-    }
-
-    /**
      * @test
      */
     public function can_select_which_sheets_will_be_imported()
