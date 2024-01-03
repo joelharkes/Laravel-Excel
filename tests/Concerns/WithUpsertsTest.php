@@ -2,7 +2,6 @@
 
 namespace Maatwebsite\Excel\Tests\Concerns;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\Importable;
@@ -20,10 +19,6 @@ class WithUpsertsTest extends TestCase
      */
     protected function setUp(): void
     {
-        if (!method_exists(Builder::class, 'upsert')) {
-            $this->markTestSkipped('The upsert feature is available on Laravel 8.10+');
-        }
-
         parent::setUp();
 
         $this->loadLaravelMigrations(['--database' => 'testing']);
