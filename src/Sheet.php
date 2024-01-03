@@ -258,7 +258,7 @@ class Sheet
             }
 
             if ($import instanceof ToCollection) {
-                $rows = $this->toArray($import, $startRow, null, $calculatesFormulas, $formatData);
+                $rows = $this->toCollection($import, $startRow, null, $calculatesFormulas, $formatData);
 
                 if ($import instanceof WithValidation) {
                     $rows = $this->turnIntoCollection($this->validated($import, $startRow, $rows));
