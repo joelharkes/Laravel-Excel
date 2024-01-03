@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithUpsertColumns;
 use Maatwebsite\Excel\Concerns\WithUpserts;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\WithValidationResult;
 use Maatwebsite\Excel\Exceptions\RowSkippedException;
 use Maatwebsite\Excel\Validators\RowValidator;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -184,10 +185,13 @@ class ModelManager
      *
      * @throws ValidationException
      */
-    private function validateRows(WithValidation $import)
+    private function validateRows(WithValidation $import): void
     {
         try {
-            $this->validator->validate($this->rows, $import);
+            $result = $this->validator->validate($this->rows, $import);
+            if($import instanceof WithValidationResult) {
+                $this->rows = $result;
+            }
         } catch (RowSkippedException $e) {
             foreach ($e->skippedRows() as $row) {
                 unset($this->rows[$row]);

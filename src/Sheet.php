@@ -258,10 +258,10 @@ class Sheet
             }
 
             if ($import instanceof ToCollection) {
-                $rows = $this->toCollection($import, $startRow, null, $calculatesFormulas, $formatData);
+                $rows = $this->toArray($import, $startRow, null, $calculatesFormulas, $formatData);
 
                 if ($import instanceof WithValidation) {
-                    $rows = $this->validated($import, $startRow, $rows);
+                    $rows = $this->turnIntoCollection($this->validated($import, $startRow, $rows));
                 }
 
                 $import->collection($rows);
@@ -382,7 +382,10 @@ class Sheet
     public function toCollection($import, int $startRow = null, $nullValue = null, $calculateFormulas = false, $formatData = false): Collection
     {
         $rows = $this->toArray($import, $startRow, $nullValue, $calculateFormulas, $formatData);
+        return $this->turnIntoCollection($rows);
+    }
 
+    private function turnIntoCollection(array $rows): Collection {
         return new Collection(array_map(function (array $row) {
             return new Collection($row);
         }, $rows));
@@ -679,16 +682,16 @@ class Sheet
     }
 
     /**
-     * @return Collection|array
+     * @return array
      */
-    protected function validated(WithValidation $import, int $startRow, $rows)
+    protected function validated(WithValidation $import, int $startRow, $rows): array
     {
         $toValidate = (new Collection($rows))->mapWithKeys(function ($row, $index) use ($startRow) {
             return [($startRow + $index) => $row];
         });
 
         try {
-            app(RowValidator::class)->validate($toValidate->toArray(), $import);
+            return app(RowValidator::class)->validate($toValidate->toArray(), $import);
         } catch (RowSkippedException $e) {
             foreach ($e->skippedRows() as $row) {
                 unset($rows[$row - $startRow]);

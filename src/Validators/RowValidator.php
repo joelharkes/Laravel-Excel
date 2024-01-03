@@ -12,16 +12,12 @@ use Maatwebsite\Excel\Exceptions\RowSkippedException;
 class RowValidator
 {
     /**
-     * @var Factory
-     */
-    private $validator;
-
-    /**
      * @param  Factory  $validator
      */
-    public function __construct(Factory $validator)
+    public function __construct(
+        private readonly Factory $validator
+    )
     {
-        $this->validator = $validator;
     }
 
     /**
@@ -31,7 +27,7 @@ class RowValidator
      * @throws ValidationException
      * @throws RowSkippedException
      */
-    public function validate(array $rows, WithValidation $import)
+    public function validate(array $rows, WithValidation $import): array
     {
         $rules      = $this->rules($import);
         $messages   = $this->messages($import);
@@ -44,7 +40,7 @@ class RowValidator
                 $import->withValidator($validator);
             }
 
-            $validator->validate();
+            return $validator->validate();
         } catch (IlluminateValidationException $e) {
             $failures = [];
             foreach ($e->errors() as $attribute => $messages) {

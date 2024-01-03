@@ -9,7 +9,7 @@ class ValidationException extends IlluminateValidationException
     /**
      * @var Failure[]
      */
-    protected $failures;
+    protected array $failures;
 
     /**
      * @param  IlluminateValidationException  $previous
@@ -30,7 +30,7 @@ class ValidationException extends IlluminateValidationException
     }
 
     /**
-     * @return array
+     * @return Failure[]
      */
     public function failures(): array
     {
