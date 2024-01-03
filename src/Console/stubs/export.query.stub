@@ -2,14 +2,12 @@
 
 namespace DummyNamespace;
 
+use Illuminate\Contracts\Database\Query\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 
 class DummyClass implements FromQuery
 {
-    /**
-    * @return \Illuminate\Database\Query\Builder
-    */
-    public function query()
+    public function query(): Builder
     {
         //
     }
