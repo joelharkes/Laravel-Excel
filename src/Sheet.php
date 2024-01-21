@@ -37,6 +37,7 @@ use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\WithValidationResult;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Events\BeforeSheet;
 use Maatwebsite\Excel\Exceptions\ConcernConflictException;
@@ -262,6 +263,9 @@ class Sheet
 
                 if ($import instanceof WithValidation) {
                     $rows = $this->validated($import, $startRow, $rows);
+                    if(is_array($rows)){
+                        $rows = $this->turnIntoCollection($rows);
+                    }
                 }
 
                 $import->collection($rows);
@@ -382,7 +386,10 @@ class Sheet
     public function toCollection($import, int $startRow = null, $nullValue = null, $calculateFormulas = false, $formatData = false): Collection
     {
         $rows = $this->toArray($import, $startRow, $nullValue, $calculateFormulas, $formatData);
+        return $this->turnIntoCollection($rows);
+    }
 
+    private function turnIntoCollection(array $rows): Collection {
         return new Collection(array_map(function (array $row) {
             return new Collection($row);
         }, $rows));
@@ -678,17 +685,17 @@ class Sheet
         unset($this->worksheet);
     }
 
-    /**
-     * @return Collection|array
-     */
-    protected function validated(WithValidation $import, int $startRow, $rows)
+    protected function validated(WithValidation $import, int $startRow, $rows): array|Collection
     {
         $toValidate = (new Collection($rows))->mapWithKeys(function ($row, $index) use ($startRow) {
             return [($startRow + $index) => $row];
         });
 
         try {
-            app(RowValidator::class)->validate($toValidate->toArray(), $import);
+            $result = app(RowValidator::class)->validate($toValidate->toArray(), $import);
+            if($import instanceof WithValidationResult){
+                return $result;
+            }
         } catch (RowSkippedException $e) {
             foreach ($e->skippedRows() as $row) {
                 unset($rows[$row - $startRow]);
